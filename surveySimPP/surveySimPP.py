@@ -4,6 +4,8 @@ import sys
 import time
 import numpy as np
 import argparse
+import pandas as pd
+from typing import Dict
 
 from surveySimPP.modules.PPMatchPointing import PPMatchPointing
 from surveySimPP.modules.PPFilterSSPLinking import PPFilterSSPLinking
@@ -24,9 +26,35 @@ from surveySimPP.modules.PPMagnitudeLimit import PPMagnitudeLimit
 from surveySimPP.modules.PPOutput import PPWriteOutput
 
 
+def runLSSTPostProcessing(cmd_args:Dict|None=None,
+                          outpath:str="/dev/null",
+                          verbose:bool=False,
+                          surveyname:str="lsst",
+                          paramsinput:str="",
+                          orbinfile:str="",
+                          oifoutput:str="",
+                          configfile:str="",
+                          makeIntermediateEphemerisDatabase:bool=False,
+                          readIntermediateEphemerisDatabase:bool=False,
+                          outfilestem:str=""):
+
+    if cmd_args is None:
+        cmd_args = {"outpath":outpath,
+                    "verbose":verbose,
+                    "surveyname":surveyname,
+                    "paramsinput":paramsinput,
+                    "orbinfile":orbinfile,
+                    "oifoutput":oifoutput,
+                    "configfile":configfile,
+                    "makeIntermediateEphemerisDatabase":makeIntermediateEphemerisDatabase,
+                    "readIntermediateEphemerisDatabase":readIntermediateEphemerisDatabase,
+                    "outfilestem":outfilestem}
+
+    return _runLSSTPostProcessing(cmd_args)
+
 # Author: Samuel Cornwall, Siegfried Eggl, Grigori Fedorets, Steph Merritt, Meg Schwamb
 
-def runLSSTPostProcessing(cmd_args):
+def _runLSSTPostProcessing(cmd_args):
 
     """
     Runs the post processing survey simulator functions that apply a series of
