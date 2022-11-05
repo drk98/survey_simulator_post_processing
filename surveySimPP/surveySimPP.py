@@ -36,7 +36,8 @@ def runLSSTPostProcessing(cmd_args:Dict|None=None,
                           configfile:str="",
                           makeIntermediateEphemerisDatabase:bool=False,
                           readIntermediateEphemerisDatabase:bool=False,
-                          outfilestem:str=""):
+                          outfilestem:str="",
+                          getDF:bool=True) -> pd.DataFrame|None:
 
     if cmd_args is None:
         cmd_args = {"outpath":outpath,
@@ -50,11 +51,11 @@ def runLSSTPostProcessing(cmd_args:Dict|None=None,
                     "readIntermediateEphemerisDatabase":readIntermediateEphemerisDatabase,
                     "outfilestem":outfilestem}
 
-    return _runLSSTPostProcessing(cmd_args)
+    return _runLSSTPostProcessing(cmd_args, getDF=getDF)
 
 # Author: Samuel Cornwall, Siegfried Eggl, Grigori Fedorets, Steph Merritt, Meg Schwamb
 
-def _runLSSTPostProcessing(cmd_args):
+def _runLSSTPostProcessing(cmd_args:Dict, getDF:bool=False, disableChuck:bool=False)->pd.DataFrame|None:
 
     """
     Runs the post processing survey simulator functions that apply a series of
@@ -113,6 +114,7 @@ def _runLSSTPostProcessing(cmd_args):
         for ii, l in enumerate(f):
             pass
     lenf = ii
+    observations_all = []
 
     while(endChunk < lenf):
         endChunk = startChunk + configs['sizeSerialChunk']
@@ -198,14 +200,19 @@ def _runLSSTPostProcessing(cmd_args):
             observations.reset_index(drop=True, inplace=True)
             verboselog('Number of rows AFTER applying SSP linking filter: ' + str(len(observations.index)))
 
-        # write output
-        PPWriteOutput(cmd_args, configs, observations, endChunk, verbose=cmd_args['verbose'])
+        if getDF:
+            observations_all.append(observations)
+        else:
+            # write output
+            PPWriteOutput(cmd_args, configs, observations, endChunk, verbose=cmd_args['verbose'])
 
         startChunk = startChunk + configs['sizeSerialChunk']
         # end for
 
     pplogger.info('Post processing completed.')
 
+    if getDF:
+        return pd.concat(observations_all)
 
 def main():
     """
