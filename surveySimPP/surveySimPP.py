@@ -27,7 +27,7 @@ from surveySimPP.modules.PPOutput import PPWriteOutput
 
 
 def runLSSTPostProcessing(cmd_args:Dict|None=None,
-                          outpath:str="/dev/null",
+                          outpath:str="",
                           verbose:bool=False,
                           surveyname:str="lsst",
                           paramsinput:str="",
